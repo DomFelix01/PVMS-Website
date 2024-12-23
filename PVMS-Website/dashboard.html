@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard - PVMS: Monitoramento e análise do sistema.">
+    <title>Dashboard - PVMS</title>
+    <link rel="stylesheet" href="assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        /* Fundo e estilo geral */
+        body {
+            background-color: #004d40; /* Verde escuro */
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header */
+        header {
+            background-color: #00695c; /* Verde médio */
+            color: #fff;
+            padding: 10px 20px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+        }
+
+        header .nav-links li {
+            display: inline-block;
+            margin: 0 10px;
+        }
+
+        header .nav-links li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        header .nav-links li a:hover {
+            color: #c8e6c9; /* Verde claro */
+        }
+
+        /* Dashboard principal */
+        .dashboard {
+            margin-top: 80px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .dashboard h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #e0f7fa;
+        }
+
+        /* Botões de navegação */
+        .tab-navigation {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            background-color: #34a853; /* Verde Sustentável */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .tab-button:hover {
+            background-color: #2c8c43;
+            transform: scale(1.05);
+        }
+
+        /* Conteúdo das abas */
+        .tab-content {
+            display: none;
+            background: #00796b;
+            color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease-out;
+            max-width: 900px;
+            margin: auto;
+            margin-top: 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Cartões de Resumo */
+        .summary-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .card {
+            background: #004d40;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            color: #fff;
+            max-width: 250px;
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .card p {
+            font-size: 1rem;
+            color: #c8e6c9;
+        }
+
+        /* Rodapé */
+        .footer {
+            background-color: #004d40;
+            color: #e0f7fa;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        .footer a {
+            color: #80cbc4; /* Verde claro */
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="assets/images/institution_logo.png" alt="Institution Logo">
+                <h1>PVMS - Dashboard</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="production_graph.html">Production Graphs</a></li>
+                <li><a href="id_management.html">ID Management</a></li>
+                <li><button onclick="logout()">Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Dashboard Navigation -->
+    <main class="dashboard">
+        <h2>Dashboard Overview</h2>
+        <div class="tab-navigation">
+            <button class="tab-button" onclick="openTab('summary')">Resumo do Sistema</button>
+            <button class="tab-button" onclick="openTab('charts')">Gráficos de Produção</button>
+            <button class="tab-button" onclick="openTab('actions')">Gerenciamento de IDs</button>
+        </div>
+
+        <!-- Tabs Content -->
+        <div id="summary" class="tab-content active">
+            <h3>Resumo do Sistema</h3>
+            <div class="summary-cards">
+                <div class="card">
+                    <h3>Energia Gerada</h3>
+                    <p><strong>500 kWh</strong> Hoje</p>
+                </div>
+                <div class="card">
+                    <h3>Status</h3>
+                    <p><strong>Operacional</strong></p>
+                </div>
+                <div class="card">
+                    <h3>IDs Ativos</h3>
+                    <p><strong>25</strong> Dispositivos</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="charts" class="tab-content">
+            <h3>Gráficos de Produção</h3>
+            <canvas id="productionChart" width="400" height="200"></canvas>
+        </div>
+
+        <div id="actions" class="tab-content">
+            <h3>Gerenciamento de IDs</h3>
+            <p>Acesse ferramentas de gerenciamento de dispositivos e IDs conectados.</p>
+            <button onclick="location.href='id_management.html'">Gerenciar IDs</button>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 PVMS - Tous droits réservés.</p>
+        <p>Contactez-nous : <a href="mailto:fila-domingos-caldei.felix@student.com">fila-domingos-caldei.felix@student.com</a></p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Verificar autenticação
+        document.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (!isLoggedIn || isLoggedIn !== "true") {
+                alert("Por favor, faça login para acessar esta página.");
+                window.location.href = "login.html";
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            alert("Você foi desconectado.");
+            window.location.href = "login.html";
+        }
+
+        function openTab(tabName) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            const activeTab = document.getElementById(tabName);
+            activeTab.classList.add('active');
+        }
+    </script>
+</body>
+</html>

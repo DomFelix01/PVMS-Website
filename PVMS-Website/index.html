@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PVMS - Découvrez les avantages de notre système de surveillance d'énergie renouvelable.">
+    <title>PVMS - Power Vision Monitoring System</title>
+    <link rel="stylesheet" href="assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
+</head>
+<body class="index">
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="assets/images/institution_logo.png" alt="Institution Logo" class="logo-institution">
+                <h1>PVMS - Power Vision Monitoring System</h1>
+                <img src="assets/images/site_logo.png" alt="Site Logo" class="logo-site">
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="connection.html">Connect</a></li>
+                <li><a href="help.html">Help/Contact</a></li>
+                <li><button onclick="logout()" class="logout-button">Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h2>Bienvenue chez PVMS</h2>
+            <p>Maximisez l'efficacité de vos systèmes IoT grâce à notre plateforme interactive.</p>
+            <button onclick="location.href='dashboard.html'">Explorez le tableau de bord</button>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features">
+        <h3>
+            <a href="why_choose_pvms.html" id="animated-question">Pourquoi choisir PVMS ?</a>
+        </h3>
+        <div class="animated-answer">
+            <p id="dynamic-answer"></p>
+        </div>
+        <div class="feature-cards">
+            <div class="card">
+                <img src="assets/images/real_time.png" alt="Real-Time Monitoring">
+                <h4>Surveillance en temps réel</h4>
+                <p>Surveillez vos appareils IoT en direct, à tout moment et où que vous soyez.</p>
+            </div>
+            <div class="card">
+                <img src="assets/images/data_analysis.png" alt="Data Analysis">
+                <h4>Analyse avancée des données</h4>
+                <p>Exploitez des graphiques et des informations détaillées pour optimiser les performances.</p>
+            </div>
+            <div class="card">
+                <img src="assets/images/id_management.png" alt="ID Management">
+                <h4>Gestion des identifiants</h4>
+                <p>Gérez, stockez et mettez à jour facilement les identifiants des appareils grâce à une interface transparente.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-left">
+                <span id="clock"></span> | Angola
+            </div>
+            <div class="footer-center">
+                <p>&copy; 2024 PVMS - Système de surveillance Power Vision. Tous droits réservés.</p>
+                <p>Contactez-nous : <a href="mailto:fila-domingos-caldei.felix@student.com">fila-domingos-caldei.felix@student.com</a></p>
+            </div>
+            <div class="footer-right">
+                <p>Créé par : Ngola Domingos Caldeira</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script for Authentication -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const isLoggedIn = localStorage.getItem("isLoggedIn");
+            if (!isLoggedIn || isLoggedIn === "false") {
+                // Redireciona para login apenas se não estiver logado
+                window.location.href = "login.html";
+            }
+        });
+
+        function logout() {
+            localStorage.setItem("isLoggedIn", "false");
+            alert("Déconnecté avec succès.");
+            window.location.href = "login.html";
+        }
+    </script>
+
+    <!-- Script for Dynamic Text -->
+    <script>
+        const answers = [
+            "Le PVMS fournit une surveillance en temps réel.",
+            "Une analyse avancée pour optimiser vos systèmes.",
+            "Gestion intuitive et efficace des identifiants.",
+            "Contribuez à un avenir énergétique durable."
+        ];
+
+        let currentAnswerIndex = 0;
+
+        function updateAnswer() {
+            const answerElement = document.getElementById("dynamic-answer");
+            answerElement.textContent = answers[currentAnswerIndex];
+            currentAnswerIndex = (currentAnswerIndex + 1) % answers.length;
+        }
+
+        setInterval(updateAnswer, 5000); // Change text every 5 seconds
+        updateAnswer(); // Show the first answer immediately
+    </script>
+
+    <!-- Script for Clock -->
+    <script>
+        function updateClock() {
+            const clockElement = document.getElementById("clock");
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, "0");
+            const minutes = now.getMinutes().toString().padStart(2, "0");
+            clockElement.textContent = `${hours}:${minutes}`;
+        }
+
+        setInterval(updateClock, 1000); // Update clock every second
+        updateClock(); // Initialize clock
+    </script>
+</body>
+</html>

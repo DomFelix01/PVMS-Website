@@ -1,0 +1,221 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gerenciamento de IDs - PVMS: Organize e gerencie dispositivos no sistema.">
+    <title>Gerenciamento de IDs - PVMS</title>
+    <link rel="stylesheet" href="assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        /* Estilo exclusivo para esta página */
+        body {
+            background-color: #004d40;
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content-wrapper {
+            margin: 100px auto;
+            max-width: 800px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            color: #e0f7fa;
+        }
+
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            width: 300px;
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #80cbc4;
+        }
+
+        .search-bar button {
+            padding: 10px 20px;
+            margin-left: 10px;
+            font-size: 1rem;
+            background-color: #34a853;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #80cbc4;
+        }
+
+        th {
+            background-color: #00796b;
+        }
+
+        tr:nth-child(even) {
+            background-color: #004d40;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #005b4f;
+        }
+
+        .actions button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+
+        .add-new {
+            background-color: #34a853;
+            color: #fff;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .add-new:hover {
+            background-color: #2c8c43;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="assets/images/institution_logo.png" alt="Institution Logo">
+                <h1>PVMS - Gerenciamento de IDs</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="production_graph.html">Gráficos de Produção</a></li>
+                <li><button onclick="logout()">Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-wrapper">
+        <h2>Gerenciamento de IDs</h2>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Buscar ID...">
+            <button onclick="searchID()">Buscar</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="idTableBody"></tbody>
+        </table>
+
+        <button class="add-new" onclick="addNewID()">Adicionar Novo ID</button>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 PVMS - Tous droits réservés.</p>
+        <p>Contactez-nous : <a href="mailto:fila-domingos-caldei.felix@student.com">fila-domingos-caldei.felix@student.com</a></p>
+    </footer>
+
+    <script>
+        // Proteger página contra acesso sem login
+        document.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (!isLoggedIn || isLoggedIn !== "true") {
+                alert("Por favor, faça login para acessar esta página.");
+                window.location.href = "login.html";
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            alert("Você foi desconectado.");
+            window.location.href = "login.html";
+        }
+
+        let ids = JSON.parse(localStorage.getItem('ids')) || [
+            { id: 'ID001', name: 'Dispositivo 1' },
+            { id: 'ID002', name: 'Dispositivo 2' },
+            { id: 'ID003', name: 'Dispositivo 3' },
+        ];
+
+        function renderTable() {
+            const tableBody = document.getElementById('idTableBody');
+            tableBody.innerHTML = '';
+            ids.forEach((item, index) => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>${item.id}</td>
+                        <td>${item.name}</td>
+                        <td>
+                            <button class="edit" onclick="editID(${index})">Editar</button>
+                            <button class="delete" onclick="deleteID(${index})">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function addNewID() {
+            const newID = prompt('Digite o novo ID:');
+            if (newID && !ids.some(item => item.id === newID)) {
+                ids.push({ id: newID, name: `Dispositivo ${ids.length + 1}` });
+                updateLocalStorage();
+                renderTable();
+            } else {
+                alert('ID inválido ou já existente.');
+            }
+        }
+
+        function deleteID(index) {
+            if (confirm(`Deseja realmente excluir o ID ${ids[index].id}?`)) {
+                ids.splice(index, 1);
+                updateLocalStorage();
+                renderTable();
+            }
+        }
+
+        function searchID() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('#idTableBody tr').forEach(row => {
+                const id = row.cells[0].textContent.toLowerCase();
+                row.style.display = id.includes(query) ? '' : 'none';
+            });
+        }
+
+        function updateLocalStorage() {
+            localStorage.setItem('ids', JSON.stringify(ids));
+        }
+
+        document.addEventListener('DOMContentLoaded', renderTable);
+    </script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Conexão - PVMS: Gerencie a conexão e IDs no módulo ESP8266.">
+    <title>Conexão - PVMS</title>
+    <link rel="stylesheet" href="assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #004d40;
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content-wrapper {
+            margin: 100px auto;
+            max-width: 800px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #e0f7fa;
+            margin-bottom: 20px;
+        }
+
+        .status {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #80cbc4;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .button-group button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #34a853;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .button-group button:hover {
+            background-color: #2c8c43;
+            transform: scale(1.05);
+        }
+
+        .button-group button.read-only-on {
+            background-color: #ff5722;
+        }
+
+        .button-group button.read-only-off {
+            background-color: #34a853;
+        }
+
+        .id-section {
+            margin-top: 40px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #80cbc4;
+        }
+
+        th {
+            background-color: #00796b;
+        }
+
+        tr:nth-child(even) {
+            background-color: #004d40;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #005b4f;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="assets/images/institution_logo.png" alt="Institution Logo">
+                <h1>PVMS - Conexão</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><button onclick="logout()">Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-wrapper">
+        <h2>Gerencie a Conexão</h2>
+        <p class="status" id="status">Status: Não Conectado</p>
+
+        <div class="button-group">
+            <button onclick="connectESP()">Conectar</button>
+            <button onclick="disconnectESP()">Desconectar</button>
+            <button id="readOnlyButton" onclick="toggleReadOnlyMode()" class="read-only-off">Modo de Leitura: Off</button>
+        </div>
+
+        <div class="id-section">
+            <h3>Gerenciamento de IDs</h3>
+            <button onclick="addNewID()">Adicionar Novo ID</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="idTableBody"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 PVMS - Tous droits réservés.</p>
+        <p>Contactez-nous : <a href="mailto:fila-domingos-caldei.felix@student.com">fila-domingos-caldei.felix@student.com</a></p>
+    </footer>
+
+    <script>
+        // Proteção por login
+        document.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (!isLoggedIn || isLoggedIn !== "true") {
+                alert("Por favor, faça login para acessar esta página.");
+                window.location.href = "login.html";
+            }
+
+            loadIds();
+            updateConnectionStatus();
+        });
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            alert("Você foi desconectado.");
+            window.location.href = "login.html";
+        }
+
+        // Gerenciar Conexão com o ESP8266
+        async function connectESP() {
+            try {
+                const response = await fetch('http://192.168.137.148/connect');
+                if (!response.ok) throw new Error('Falha ao conectar');
+                const data = await response.text();
+                alert(data);
+                updateConnectionStatus(true);
+            } catch (error) {
+                alert('Erro ao conectar ao ESP8266: ' + error.message);
+            }
+        }
+
+        async function disconnectESP() {
+            try {
+                const response = await fetch('http://192.168.137.148/disconnect');
+                if (!response.ok) throw new Error('Falha ao desconectar');
+                const data = await response.text();
+                alert(data);
+                updateConnectionStatus(false);
+            } catch (error) {
+                alert('Erro ao desconectar do ESP8266: ' + error.message);
+            }
+        }
+
+        function updateConnectionStatus(connected = false) {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = connected ? 'Status: Conectado' : 'Status: Não Conectado';
+        }
+
+        // Gerenciar IDs
+        let ids = [];
+
+        async function loadIds() {
+            try {
+                const response = await fetch('http://192.168.137.148/list_ids');
+                if (!response.ok) throw new Error('Falha ao carregar IDs');
+                ids = await response.json();
+                renderIds();
+            } catch (error) {
+                alert('Erro ao carregar IDs do ESP8266: ' + error.message);
+            }
+        }
+
+        function renderIds() {
+            const tableBody = document.getElementById('idTableBody');
+            tableBody.innerHTML = '';
+            ids.forEach((id, index) => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>${id}</td>
+                        <td>
+                            <button onclick="deleteID(${index})">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function addNewID() {
+            const newID = prompt('Digite o novo ID:');
+            if (newID) {
+                try {
+                    const response = await fetch(`http://192.168.137.148/add_id?id=${newID}`);
+                    if (!response.ok) throw new Error('Falha ao adicionar ID');
+                    const data = await response.text();
+                    alert(data);
+                    loadIds();
+                } catch (error) {
+                    alert('Erro ao adicionar ID: ' + error.message);
+                }
+            }
+        }
+
+        async function deleteID(index) {
+            const idToDelete = ids[index];
+            try {
+                const response = await fetch(`http://192.168.137.148/delete_id?id=${idToDelete}`);
+                if (!response.ok) throw new Error('Falha ao excluir ID');
+                const data = await response.text();
+                alert(data);
+                loadIds();
+            } catch (error) {
+                alert('Erro ao excluir ID: ' + error.message);
+            }
+        }
+
+        // Modo de leitura
+        async function toggleReadOnlyMode() {
+            const button = document.getElementById('readOnlyButton');
+            const newMode = button.classList.contains('read-only-off') ? 'on' : 'off';
+
+            try {
+                const response = await fetch(`http://192.168.137.148/toggle_read_only?mode=${newMode}`);
+                if (!response.ok) throw new Error('Falha ao alterar modo de leitura');
+                const data = await response.text();
+                alert(data);
+                button.textContent = `Modo de Leitura: ${newMode === 'on' ? 'On' : 'Off'}`;
+                button.classList.toggle('read-only-on');
+                button.classList.toggle('read-only-off');
+            } catch (error) {
+                alert('Erro ao alterar o modo de leitura: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

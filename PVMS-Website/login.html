@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Login - PVMS: Acesse o sistema com segurança.">
+    <title>Login - PVMS</title>
+    <link rel="stylesheet" href="assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #004d40;
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background: #00695c;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            width: 300px;
+            text-align: center;
+        }
+
+        .login-container h2 {
+            margin-bottom: 20px;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .login-container button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: #34a853;
+            color: #fff;
+        }
+
+        .login-container button:hover {
+            background-color: #2c8c43;
+        }
+
+        .reset-link {
+            color: #fdda44;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            margin: 10px 0;
+        }
+
+        .reset-link:hover {
+            text-decoration: underline;
+        }
+
+        .reset-section, .register-section {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .questions {
+            text-align: left;
+            margin: 10px 0;
+        }
+
+        .questions label {
+            display: block;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login - PVMS</h2>
+        <!-- Login Form -->
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Nome de usuário" required>
+            <input type="password" id="password" placeholder="Senha" required>
+            <button type="submit">Login</button>
+        </form>
+        <a href="#" class="reset-link" id="resetPasswordLink">Esqueceu sua senha?</a>
+        <a href="#" class="reset-link" id="registerLink">Criar nova conta</a>
+
+        <!-- Reset Password Section -->
+        <div class="reset-section" id="resetSection">
+            <h3>Redefinir Senha</h3>
+            <div class="questions">
+                <label>Qual é sua cor favorita?</label>
+                <select id="question1">
+                    <option value="">Selecione</option>
+                    <option value="azul">Azul</option>
+                    <option value="verde">Verde</option>
+                    <option value="vermelho">Vermelho</option>
+                </select>
+                <label>Qual é o nome do seu primeiro animal de estimação?</label>
+                <input type="text" id="question2" placeholder="Resposta">
+                <label>Qual cidade você nasceu?</label>
+                <input type="text" id="question3" placeholder="Resposta">
+            </div>
+            <button onclick="resetPassword()">Enviar</button>
+        </div>
+
+        <!-- Register Section -->
+        <div class="register-section" id="registerSection">
+            <h3>Criar Nova Conta</h3>
+            <input type="text" id="newUsername" placeholder="Nome de usuário" required>
+            <input type="password" id="newPassword" placeholder="Senha" required>
+            <button onclick="registerUser()">Registrar</button>
+        </div>
+    </div>
+
+    <script>
+        const resetLink = document.getElementById('resetPasswordLink');
+        const registerLink = document.getElementById('registerLink');
+        const resetSection = document.getElementById('resetSection');
+        const registerSection = document.getElementById('registerSection');
+        const loginForm = document.getElementById('loginForm');
+
+        resetLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            resetSection.style.display = 'block';
+            registerSection.style.display = 'none';
+        });
+
+        registerLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerSection.style.display = 'block';
+            resetSection.style.display = 'none';
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const storedUser = localStorage.getItem('username');
+            const storedPass = localStorage.getItem('password');
+
+            if (username === storedUser && password === storedPass) {
+                localStorage.setItem("isLoggedIn", "true");
+                alert('Login bem-sucedido!');
+                window.location.href = 'index.html';
+            } else {
+                alert('Nome de usuário ou senha incorretos.');
+            }
+        });
+
+        function registerUser() {
+            const newUsername = document.getElementById('newUsername').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            if (newUsername && newPassword) {
+                localStorage.setItem('username', newUsername);
+                localStorage.setItem('password', newPassword);
+                alert('Usuário registrado com sucesso!');
+                registerSection.style.display = 'none';
+            } else {
+                alert('Por favor, preencha todos os campos.');
+            }
+        }
+
+        function resetPassword() {
+            const answer1 = document.getElementById('question1').value;
+            const answer2 = document.getElementById('question2').value.toLowerCase();
+            const answer3 = document.getElementById('question3').value.toLowerCase();
+
+            if (answer1 === "azul" && answer2 === "rex" && answer3 === "luanda") {
+                const newPass = prompt('Digite sua nova senha:');
+                if (newPass) {
+                    localStorage.setItem('password', newPass);
+                    alert('Senha redefinida com sucesso!');
+                    resetSection.style.display = 'none';
+                }
+            } else {
+                alert('Respostas incorretas. Tente novamente.');
+            }
+        }
+    </script>
+</body>
+</html>

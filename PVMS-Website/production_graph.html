@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gráficos de Produção - PVMS: Visualize e analise a produção de energia.">
+    <title>Gráficos de Produção - PVMS</title>
+    <link rel="stylesheet" href="assets/styles/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #004d40; /* Verde escuro */
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .content-wrapper {
+            margin: 100px auto;
+            max-width: 1200px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .button-group button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #34a853;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .button-group button:hover {
+            background-color: #2c8c43;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="assets/images/institution_logo.png" alt="Institution Logo">
+                <h1>PVMS - Gráficos de Produção</h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><button onclick="logout()">Logout</button></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-wrapper">
+        <h2>Gráficos de Produção</h2>
+        <p>Visualize a produção de energia ao longo de diferentes períodos.</p>
+
+        <!-- Botões de Interação -->
+        <div class="button-group">
+            <button onclick="showDaily()">Diário</button>
+            <button onclick="showWeekly()">Semanal</button>
+            <button onclick="showMonthly()">Mensal</button>
+        </div>
+
+        <!-- Gráfico -->
+        <div class="chart-container">
+            <canvas id="productionChart"></canvas>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 PVMS - Tous droits réservés.</p>
+        <p>Contactez-nous : <a href="mailto:fila-domingos-caldei.felix@student.com">fila-domingos-caldei.felix@student.com</a></p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Proteção por login
+        document.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (!isLoggedIn || isLoggedIn !== "true") {
+                alert("Por favor, faça login para acessar esta página.");
+                window.location.href = "login.html";
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            alert("Você foi desconectado.");
+            window.location.href = "login.html";
+        }
+
+        const ctx = document.getElementById('productionChart').getContext('2d');
+        let productionChart;
+
+        function renderChart(labels, data, label) {
+            if (productionChart) productionChart.destroy();
+            productionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        function showDaily() {
+            renderChart(['06:00', '09:00', '12:00', '15:00', '18:00'], [20, 40, 60, 80, 100], 'Produção Diária (kWh)');
+        }
+
+        function showWeekly() {
+            renderChart(['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'], [150, 200, 170, 220, 180, 250, 230], 'Produção Semanal (kWh)');
+        }
+
+        function showMonthly() {
+            renderChart(['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'], [600, 700, 650, 750], 'Produção Mensal (kWh)');
+        }
+
+        // Mostra o gráfico diário por padrão
+        document.addEventListener('DOMContentLoaded', showDaily);
+    </script>
+</body>
+</html>
